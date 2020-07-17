@@ -210,9 +210,9 @@ k_tax
 
 
 # Individual Rater Checks
-# 1 - Andres
+# 1 - MA
 ```{r eval = TRUE, message = FALSE}
-type1<- filter(data, data$ra_name.1 == "Andres")
+type1<- filter(data, data$ra_name.1 == "MA")
 type1<- transmute(type1, type_mt = type1$beverage_type_mt, type_ra = type1$beverage_type_ra)
 ```
 
@@ -235,14 +235,14 @@ type1_tp <- t(type1)
 ## Krippendorf's alpha for beverage type
 ```{r eval = TRUE, message = FALSE}
 k_type1 <- kripp.alpha(type1_tp, "nominal")
-print("K Alpha - Andres")
+print("K Alpha - MA")
 k_type1
 ```
 
 # Individual Rater Checks
-# 2 - Frid
+# 2 - EF
 ```{r eval = TRUE, message = FALSE}
-type2<- filter(data, data$ra_name.1 == "Frid")
+type2<- filter(data, data$ra_name.1 == "EF")
 type2<- transmute(type2, type_mt = type2$beverage_type_mt, type_ra = type2$beverage_type_ra)
 ```
 
@@ -267,15 +267,15 @@ type2_tp <- t(type2)
 ## Krippendorf's alpha for beverage type
 ```{r eval = TRUE, message = FALSE}
 k_type2 <- kripp.alpha(type2_tp, "nominal")
-print("K Alpha - Frid")
+print("K Alpha - EF")
 k_type2
 ```
 
 
 # Individual Rater Checks
-# 3 - Lubbers
+# 3 - TL
 ```{r eval = TRUE, message = FALSE}
-type3<- filter(data, data$ra_name.1 == "Lubbers")
+type3<- filter(data, data$ra_name.1 == "TL")
 type3<- transmute(type3, type_mt = type3$beverage_type_mt, type_ra = type3$beverage_type_ra)
 ```
 
@@ -300,14 +300,14 @@ type3_tp <- t(type3)
 ## Krippendorf's alpha for beverage type
 ```{r eval = TRUE, message = FALSE}
 k_type3 <- kripp.alpha(type3_tp, "nominal")
-print("K Alpha - Lubbers")
+print("K Alpha - TL")
 k_type3
 ```
 
 # Individual Rater Checks
-# 4 - McKeown
+# 4 - CL
 ```{r eval = TRUE, message = FALSE}
-type4<- filter(data, data$ra_name.1 == "McKeown")
+type4<- filter(data, data$ra_name.1 == "CM")
 type4<- transmute(type4, type_mt = type4$beverage_type_mt, type_ra = type4$beverage_type_ra)
 ```
 
@@ -332,14 +332,14 @@ type4_tp <- t(type4)
 ## Krippendorf's alpha for beverage type
 ```{r eval = TRUE, message = FALSE}
 k_type4 <- kripp.alpha(type4_tp, "nominal")
-print("K Alpha - McKeown")
+print("K Alpha - CM")
 k_type4
 ```
 
 # Individual Rater Checks
-# 5 - White
+# 5 - JW
 ```{r eval = TRUE, message = FALSE}
-type5<- filter(data, data$ra_name.1 == "White")
+type5<- filter(data, data$ra_name.1 == "JW")
 type5<- transmute(type5, type_mt = type5$beverage_type_mt, type_ra = type5$beverage_type_ra)
 ```
 
@@ -364,27 +364,9 @@ type5_tp <- t(type5)
 ## Krippendorf's alpha for beverage type
 ```{r eval = TRUE, message = FALSE}
 k_type5 <- kripp.alpha(type5_tp, "nominal")
-print("K Alpha - White")
+print("K Alpha - JW")
 k_type5
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
