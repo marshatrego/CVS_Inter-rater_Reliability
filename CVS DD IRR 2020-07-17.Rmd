@@ -1,0 +1,419 @@
+---
+title: "CVS DD IRR 2020-07-17"
+author: "Marsha"
+date: "07/17/2020"
+output:
+  html_document:
+    toc: TRUE
+    toc_float:
+      collapsed: TRUE
+      smooth_scroll: TRUE
+    depth: 3
+    theme: spacelab
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(irr)
+library(dplyr)
+library(tidyverse)
+```
+
+# Example
+## Krippendorff's Alpha example from R documentation
+```{r eval = TRUE, message = FALSE}
+nmm<-matrix(c(1,1,NA,1,2,2,3,2,3,3,3,3,3,3,3,3,2,2,2,2,1,2,3,4,4,4,4,4,
+              1,1,2,1,2,2,2,2,NA,5,5,5,NA,NA,1,1,NA,NA,3,NA),nrow=4)
+# first assume the default nominal classification
+kanom<-kripp.alpha(nmm)
+view(kanom)
+# now use the same data with the other three methods
+kaordinal<-kripp.alpha(nmm,"ordinal")
+kaint<- kripp.alpha(nmm,"interval")
+karat<- kripp.alpha(nmm,"ratio") 
+```
+
+# Importing Data
+## Importing data csv from local file 
+```{r eval = TRUE, message = FALSE}
+rm(list=ls()) 
+graphics.off()
+getwd()
+setwd('C:/Users/Marsha/Box/CVS Beverage Tax/CVS Data Coding/Double Data Entry/200 Entries MT Data')
+data <- read.csv('200_entries_combined_mt.csv')
+```
+
+
+
+
+
+
+# Bev Type Category
+## Transmuting data into new table with just the grocery category and dd
+```{r eval = TRUE, message = FALSE}
+type<- transmute(data, type_mt = data$beverage_type_mt, type_ra = data$beverage_type_ra)
+```
+
+## Recoding all categories into numeric and standardizing
+```{r eval = TRUE, message = FALSE}
+table(type$type_mt)
+table(type$type_ra)
+#Relabel values for type, unsure and bev not found together
+# beverage not found 1
+#coffee 2
+#concentrates 3
+#energy drink 4
+#flavored water 5
+#iced tea or lemonade 6
+#juice 7
+#milk 8
+#milk alternative 9
+#not a beverage 10
+#other beverage 11
+#regular water 12
+#soda 13
+#sparkling water 14
+#sports drink 15
+# unsure 1
+
+#Relabel values for type
+
+type <- mutate(type, type_mt=factor(type_mt, levels = c("beverage not found", "coffee", "concentrates", "energy drink", "flavored water", "iced tea or lemonade",
+                                                        "juice", "milk", "milk alternative", "not a beverage", "other beverage", "regular water", "soda", "sparkling water", 
+                                                        "sports drink", "unsure"),
+                                                 labels = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 1)))
+type <- mutate(type, type_ra=factor(type_ra, levels = c("beverage not found", "coffee", "concentrates", "energy drink", "flavored water", "iced tea or lemonade",
+                                                        "juice", "milk", "milk alternative", "not a beverage", "other beverage", "regular water", "soda", "sparkling water", 
+                                                        "sports drink", "unsure"),
+                                                 labels = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 1)))
+```
+
+## Transposing data
+```{r eval = TRUE, message = FALSE}
+#subjects and raters were flipped so transposing the data using t() function
+type_tp <- t(type)
+```
+
+## Krippendorf's alpha for beverage type
+```{r eval = TRUE, message = FALSE}
+k_type <- kripp.alpha(type_tp, "nominal")
+#view(k_type)
+#k_grocery_drop <- kripp.alpha(grocery_tp_drop, "nominal")
+#view(k_grocery_drop)
+print("K Alpha Beverage Type")
+k_type
+#k_grocery_drop
+#Agreement for grocery category is 0.961 for 4889 subjects with 2 raters. 
+#Agreement is 0.951 for 3858 subjects with 2 raters, with double restaurant determination dropped (n=1031)
+```
+
+
+
+# Sweetener Category
+## Transmuting data into new table with just the sweetener and dd
+```{r eval = TRUE, message = FALSE}
+sweet<- transmute(data, sweet_mt = data$sweetener_type_mt, sweet_ra = data$sweetener_type_ra)
+```
+
+## Recoding all categories into numeric and standardizing
+```{r eval = TRUE, message = FALSE}
+table(sweet$sweet_mt)
+table(sweet$sweet_ra)
+#Relabel values for type, unsure and bev not found together
+# artificial 1 
+# hybrid 2
+# not sweetened 3
+# sugar 4
+# sweetened (unknown) 5
+# unknown 6
+
+
+#Relabel values for type
+
+sweet <- mutate(sweet, sweet_mt=factor(sweet_mt, levels = c("artificial", "hybrid", "not sweetened", "sugar", "sweetened (unknown)", "unknown"),
+                                                 labels = c(1, 2, 3, 4, 5, 6)))
+sweet <- mutate(sweet, sweet_ra=factor(sweet_ra, levels = c("artificial", "hybrid", "not sweetened", "sugar", "sweetened (unknown)", "unknown"),
+                                                 labels = c(1, 2, 3, 4, 5, 6)))
+```
+
+## Transposing data
+```{r eval = TRUE, message = FALSE}
+#subjects and raters were flipped so transposing the data using t() function
+sweet_tp <- t(sweet)
+```
+
+## Krippendorf's alpha for beverage sweet
+```{r eval = TRUE, message = FALSE}
+k_sweet <- kripp.alpha(sweet_tp, "nominal")
+#view(k_sweet)
+#k_grocery_drop <- kripp.alpha(grocery_tp_drop, "nominal")
+#view(k_grocery_drop)
+print("K Alpha Sweetener")
+k_sweet
+#k_grocery_drop
+#Agreement for grocery category is 0.961 for 4889 subjects with 2 raters. 
+#Agreement is 0.951 for 3858 subjects with 2 raters, with double restaurant determination dropped (n=1031)
+```
+
+# Tax Category
+## Transmuting data into new table with just the tax and dd
+```{r eval = TRUE, message = FALSE}
+tax <- transmute(data, tax_mt = data$tax_status_mt, tax_ra = data$tax_status_ra)
+```
+
+## Recoding all categories into numeric and standardizing
+```{r eval = TRUE, message = FALSE}
+table(tax$tax_mt)
+table(tax$tax_ra)
+#Relabel values for tax, unsure and bev not found together
+# not taxed 1
+# taxed 2
+# unsure 3
+
+#Relabel values for tax
+
+tax <- mutate(tax, tax_mt=factor(tax_mt, levels = c("not taxed", "taxed", "unsure"),
+                                                 labels = c(1, 2, 3)))
+tax <- mutate(tax, tax_ra=factor(tax_ra, levels = c("not taxed", "taxed", "unsure"),
+                                                 labels = c(1, 2, 3)))
+```
+
+## Transposing data
+```{r eval = TRUE, message = FALSE}
+#subjects and raters were flipped so transposing the data using t() function
+tax_tp <- t(tax)
+```
+
+## Krippendorf's alpha for beverage tax
+```{r eval = TRUE, message = FALSE}
+k_tax <- kripp.alpha(tax_tp, "nominal")
+#view(k_tax)
+#k_grocery_drop <- kripp.alpha(grocery_tp_drop, "nominal")
+#view(k_grocery_drop)
+print("K Alpha Tax")
+k_tax
+#k_grocery_drop
+#Agreement for grocery category is 0.961 for 4889 subjects with 2 raters. 
+#Agreement is 0.951 for 3858 subjects with 2 raters, with double restaurant determination dropped (n=1031)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Individual Rater Checks
+# 1 - Andres
+```{r eval = TRUE, message = FALSE}
+type1<- filter(data, data$ra_name.1 == "Andres")
+type1<- transmute(type1, type_mt = type1$beverage_type_mt, type_ra = type1$beverage_type_ra)
+```
+
+## Recoding all categories into numeric and standardizing
+```{r eval = TRUE, message = FALSE}
+type1 <- mutate(type1, type_mt=factor(type_mt, levels = c("beverage not found", "coffee", "concentrates", "energy drink", "flavored water", "iced tea or lemonade",
+                                                        "juice", "milk", "milk alternative", "not a beverage", "other beverage", "regular water", "soda", "sparkling water", 
+                                                        "sports drink", "unsure"),
+                                                 labels = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 1)))
+type1 <- mutate(type1, type_ra=factor(type_ra, levels = c("beverage not found", "coffee", "concentrates", "energy drink", "flavored water", "iced tea or lemonade",
+                                                        "juice", "milk", "milk alternative", "not a beverage", "other beverage", "regular water", "soda", "sparkling water", 
+                                                        "sports drink", "unsure"),
+                                                 labels = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 1)))
+```
+## Transposing data
+```{r eval = TRUE, message = FALSE}
+#subjects and raters were flipped so transposing the data using t() function
+type1_tp <- t(type1)
+```
+## Krippendorf's alpha for beverage type
+```{r eval = TRUE, message = FALSE}
+k_type1 <- kripp.alpha(type1_tp, "nominal")
+print("K Alpha - Andres")
+k_type1
+```
+
+# Individual Rater Checks
+# 2 - Frid
+```{r eval = TRUE, message = FALSE}
+type2<- filter(data, data$ra_name.1 == "Frid")
+type2<- transmute(type2, type_mt = type2$beverage_type_mt, type_ra = type2$beverage_type_ra)
+```
+
+## Recoding all categories into numeric and standardizing
+```{r eval = TRUE, message = FALSE}
+type2 <- mutate(type2, type_mt=factor(type_mt, levels = c("beverage not found", "coffee", "concentrates", "energy drink", "flavored water", "iced tea or lemonade",
+                                                        "juice", "milk", "milk alternative", "not a beverage", "other beverage", "regular water", "soda", "sparkling water", 
+                                                        "sports drink", "unsure"),
+                                                 labels = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 1)))
+type2 <- mutate(type2, type_ra=factor(type_ra, levels = c("beverage not found", "coffee", "concentrates", "energy drink", "flavored water", "iced tea or lemonade",
+                                                        "juice", "milk", "milk alternative", "not a beverage", "other beverage", "regular water", "soda", "sparkling water", 
+                                                        "sports drink", "unsure"),
+                                                 labels = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 1)))
+```
+
+## Transposing data
+```{r eval = TRUE, message = FALSE}
+#subjects and raters were flipped so transposing the data using t() function
+type2_tp <- t(type2)
+```
+
+## Krippendorf's alpha for beverage type
+```{r eval = TRUE, message = FALSE}
+k_type2 <- kripp.alpha(type2_tp, "nominal")
+print("K Alpha - Frid")
+k_type2
+```
+
+
+# Individual Rater Checks
+# 3 - Lubbers
+```{r eval = TRUE, message = FALSE}
+type3<- filter(data, data$ra_name.1 == "Lubbers")
+type3<- transmute(type3, type_mt = type3$beverage_type_mt, type_ra = type3$beverage_type_ra)
+```
+
+## Recoding all categories into numeric and standardizing
+```{r eval = TRUE, message = FALSE}
+type3 <- mutate(type3, type_mt=factor(type_mt, levels = c("beverage not found", "coffee", "concentrates", "energy drink", "flavored water", "iced tea or lemonade",
+                                                        "juice", "milk", "milk alternative", "not a beverage", "other beverage", "regular water", "soda", "sparkling water", 
+                                                        "sports drink", "unsure"),
+                                                 labels = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 1)))
+type3 <- mutate(type3, type_ra=factor(type_ra, levels = c("beverage not found", "coffee", "concentrates", "energy drink", "flavored water", "iced tea or lemonade",
+                                                        "juice", "milk", "milk alternative", "not a beverage", "other beverage", "regular water", "soda", "sparkling water", 
+                                                        "sports drink", "unsure"),
+                                                 labels = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 1)))
+```
+
+## Transposing data
+```{r eval = TRUE, message = FALSE}
+#subjects and raters were flipped so transposing the data using t() function
+type3_tp <- t(type3)
+```
+
+## Krippendorf's alpha for beverage type
+```{r eval = TRUE, message = FALSE}
+k_type3 <- kripp.alpha(type3_tp, "nominal")
+print("K Alpha - Lubbers")
+k_type3
+```
+
+# Individual Rater Checks
+# 4 - McKeown
+```{r eval = TRUE, message = FALSE}
+type4<- filter(data, data$ra_name.1 == "McKeown")
+type4<- transmute(type4, type_mt = type4$beverage_type_mt, type_ra = type4$beverage_type_ra)
+```
+
+## Recoding all categories into numeric and standardizing
+```{r eval = TRUE, message = FALSE}
+type4 <- mutate(type4, type_mt=factor(type_mt, levels = c("beverage not found", "coffee", "concentrates", "energy drink", "flavored water", "iced tea or lemonade",
+                                                        "juice", "milk", "milk alternative", "not a beverage", "other beverage", "regular water", "soda", "sparkling water", 
+                                                        "sports drink", "unsure"),
+                                                 labels = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 1)))
+type4 <- mutate(type4, type_ra=factor(type_ra, levels = c("beverage not found", "coffee", "concentrates", "energy drink", "flavored water", "iced tea or lemonade",
+                                                        "juice", "milk", "milk alternative", "not a beverage", "other beverage", "regular water", "soda", "sparkling water", 
+                                                        "sports drink", "unsure"),
+                                                 labels = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 1)))
+```
+
+## Transposing data
+```{r eval = TRUE, message = FALSE}
+#subjects and raters were flipped so transposing the data using t() function
+type4_tp <- t(type4)
+```
+
+## Krippendorf's alpha for beverage type
+```{r eval = TRUE, message = FALSE}
+k_type4 <- kripp.alpha(type4_tp, "nominal")
+print("K Alpha - McKeown")
+k_type4
+```
+
+# Individual Rater Checks
+# 5 - White
+```{r eval = TRUE, message = FALSE}
+type5<- filter(data, data$ra_name.1 == "White")
+type5<- transmute(type5, type_mt = type5$beverage_type_mt, type_ra = type5$beverage_type_ra)
+```
+
+## Recoding all categories into numeric and standardizing
+```{r eval = TRUE, message = FALSE}
+type5 <- mutate(type5, type_mt=factor(type_mt, levels = c("beverage not found", "coffee", "concentrates", "energy drink", "flavored water", "iced tea or lemonade",
+                                                        "juice", "milk", "milk alternative", "not a beverage", "other beverage", "regular water", "soda", "sparkling water", 
+                                                        "sports drink", "unsure"),
+                                                 labels = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 1)))
+type5 <- mutate(type5, type_ra=factor(type_ra, levels = c("beverage not found", "coffee", "concentrates", "energy drink", "flavored water", "iced tea or lemonade",
+                                                        "juice", "milk", "milk alternative", "not a beverage", "other beverage", "regular water", "soda", "sparkling water", 
+                                                        "sports drink", "unsure"),
+                                                 labels = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 1)))
+```
+
+## Transposing data
+```{r eval = TRUE, message = FALSE}
+#subjects and raters were flipped so transposing the data using t() function
+type5_tp <- t(type5)
+```
+
+## Krippendorf's alpha for beverage type
+```{r eval = TRUE, message = FALSE}
+k_type5 <- kripp.alpha(type5_tp, "nominal")
+print("K Alpha - White")
+k_type5
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Checkin KCals
+## Transmuting data into new table with just the kcals and dd
+```{r eval = TRUE, message = FALSE}
+kcal <- filter(data, data$Kcal_per_serving_1 > 0)
+kcal <- transmute(kcal, kcal_mt = kcal$Kcal_per_serving_1, kcal_ra = kcal$Kcal_per_serving_2)
+```
+
+
+## Transposing data
+```{r eval = TRUE, message = FALSE}
+#subjects and raters were flipped so transposing the data using t() function
+kcal_tp <- t(kcal)
+```
+
+## Krippendorf's alpha for beverage type
+```{r eval = TRUE, message = FALSE}
+k_kcal <- kripp.alpha(kcal_tp, "nominal")
+print("K Alpha - kcal")
+k_kcal
+```
+
+
+
+
+
